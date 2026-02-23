@@ -617,10 +617,20 @@ setup_kubernetes_provider() {
         "Apply Kubernetes Terraform configuration"
 
     if [[ "$DRY_RUN" == false ]]; then
-        # Get cluster IP
-        local CLUSTER_IP=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}' | sed 's|.*://||;s|:.*||')
-        export CLUSTER_IP
-        print_info "Cluster IP: $CLUSTER_IP"
+        # Get cluster API server URL and extract components
+        local FULL_SERVER=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+        local CLUSTER_IP=$(echo "$FULL_SERVER" | sed 's|.*://||;s|:.*||')
+        local CLUSTER_PORT=$(echo "$FULL_SERVER" | sed 's|.*://||' | grep -oP ':\K[0-9]+$' || echo "6443")
+
+        # For localhost connections, we might need to adjust
+        if [[ "$CLUSTER_IP" == "127.0.0.1" || "$CLUSTER_IP" == "localhost" ]]; then
+            print_warning "Detected localhost cluster: $FULL_SERVER"
+            print_info "Note: Kubernetes provider will use port-forward for remote cluster simulation"
+        fi
+
+        export CLUSTER_IP CLUSTER_PORT
+        print_info "Cluster API Server: $FULL_SERVER"
+        print_info "Cluster IP: $CLUSTER_IP, Port: $CLUSTER_PORT"
     fi
 
     print_success "Kubernetes provider infrastructure setup complete"
@@ -678,9 +688,9 @@ create_clustersecretstores() {
     if [[ "$SKIP_K8S" == false ]]; then
         print_info "Creating Kubernetes ClusterSecretStore..."
         if [[ "$DRY_RUN" == false ]]; then
-            CLUSTER_IP="${CLUSTER_IP:-}" \
+            CLUSTER_IP="${CLUSTER_IP:-}" CLUSTER_PORT="${CLUSTER_PORT:-6443}" \
             eval "echo \"$(cat $SCRIPT_DIR/ClusterSecretStores/kubernetes/k8s-secretstore.template.yaml)\"" | \
-            kubectl apply -f - 2>/dev/null || print_warning "K8s ClusterSecretStore creation skipped (cluster IP missing)"
+            kubectl apply -f - 2>/dev/null || print_warning "K8s ClusterSecretStore creation skipped (cluster info missing)"
         else
             print_info "$ kubectl apply -f ClusterSecretStores/kubernetes/k8s-secretstore.template.yaml"
         fi
