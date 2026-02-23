@@ -716,8 +716,7 @@ run_demo_1_pull_secrets() {
         "cd $SCRIPT_DIR && for file in ./ExternalSecrets/*; do
     if [ -f \"\$file\" ]; then
         provider_store=\"\${PROVIDER}-secret-store\"
-        eval \"echo \\\"\\$(cat \$file)\\\"; echo 'spec.secretStoreRef.name: '\$provider_store\" | \
-        sed \"s|\\\$provider-secret-store|\$provider_store|g\" | kubectl apply -f - 2>/dev/null
+        cat \"\$file\" | sed \"s/\\\$provider-secret-store/\$provider_store/g\" | kubectl apply -f - 2>/dev/null
     fi
 done" \
         "Apply ExternalSecrets for $PROVIDER provider"
