@@ -7,7 +7,7 @@ This document summarizes the new automation and tooling added to the ESO Demo re
 ### New Files Created
 
 #### 1. **run-demo.sh** (Main Demo Script)
-- **Location**: `/run-demo.sh`
+- **Location**: ./scripts/run-demo.sh`
 - **Size**: ~33 KB
 - **Purpose**: Complete end-to-end ESO demo automation
 - **Features**:
@@ -24,7 +24,7 @@ This document summarizes the new automation and tooling added to the ESO Demo re
   - ✓ Interactive cleanup with save option
 
 #### 2. **eso-utils.sh** (Utility Script)
-- **Location**: `/eso-utils.sh`
+- **Location**: ./scripts/eso-utils.sh`
 - **Size**: ~8 KB
 - **Purpose**: Common ESO operations and inspection
 - **Commands Available**:
@@ -80,25 +80,25 @@ This document summarizes the new automation and tooling added to the ESO Demo re
 ### Dry-Run Mode
 Allows previewing all commands without execution - perfect for training:
 ```bash
-./run-demo.sh --dry-run
+./scripts/run-demo.sh --dry-run
 ```
 
 ### Provider Selection
 Demo with any supported provider:
 ```bash
-./run-demo.sh --provider vault        # HashiCorp Vault
-./run-demo.sh --provider azure        # Azure Key Vault
-./run-demo.sh --provider awssm        # AWS Secrets Manager
-./run-demo.sh --provider awsps        # AWS Parameter Store
-./run-demo.sh --provider k8s          # Kubernetes (multi-cluster)
+./scripts/run-demo.sh --provider vault        # HashiCorp Vault
+./scripts/run-demo.sh --provider azure        # Azure Key Vault
+./scripts/run-demo.sh --provider awssm        # AWS Secrets Manager
+./scripts/run-demo.sh --provider awsps        # AWS Parameter Store
+./scripts/run-demo.sh --provider k8s          # Kubernetes (multi-cluster)
 ```
 
 ### Modular Execution
 Skip unnecessary components:
 ```bash
-./run-demo.sh --skip-aws --skip-azure  # Vault + K8s only
-./run-demo.sh --skip-tf                # Skip infrastructure setup
-./run-demo.sh --skip-vault             # Skip Vault
+./scripts/run-demo.sh --skip-aws --skip-azure  # Vault + K8s only
+./scripts/run-demo.sh --skip-tf                # Skip infrastructure setup
+./scripts/run-demo.sh --skip-vault             # Skip Vault
 ```
 
 ### Four Complete Demos
@@ -148,34 +148,34 @@ $ terraform apply -auto-approve
 
 ### 1. **Classroom Training**
 ```bash
-./run-demo.sh --dry-run          # Preview all steps
-./run-demo.sh --provider vault   # Deploy demo
-watch './eso-utils.sh status'    # Live monitoring
+./scripts/run-demo.sh --dry-run          # Preview all steps
+./scripts/run-demo.sh --provider vault   # Deploy demo
+watch './scripts/eso-utils.sh status'    # Live monitoring
 ```
 
 ### 2. **Quick Testing**
 ```bash
-./run-demo.sh --skip-aws --skip-azure --provider vault
+./scripts/run-demo.sh --skip-aws --skip-azure --provider vault
 ```
 
 ### 3. **Multi-Provider Comparison**
 ```bash
 for provider in azure awssm vault k8s; do
-  ./run-demo.sh --provider $provider --no-cleanup
+  ./scripts/run-demo.sh --provider $provider --no-cleanup
 done
 ```
 
 ### 4. **Validation Testing**
 ```bash
-./run-demo.sh
-./eso-utils.sh test-sync
-./eso-utils.sh logs
+./scripts/run-demo.sh
+./scripts/eso-utils.sh test-sync
+./scripts/eso-utils.sh logs
 ```
 
 ### 5. **Manual Exploration**
 ```bash
-./run-demo.sh --no-cleanup
-./eso-utils.sh inspect data-by-name
+./scripts/run-demo.sh --no-cleanup
+./scripts/eso-utils.sh inspect data-by-name
 kubectl edit externalsecret data-by-name -n eso-demo
 ```
 
@@ -254,11 +254,11 @@ cp .env.template .env
 # Edit .env with your AWS/Azure credentials
 
 # 2. Run demo
-./run-demo.sh
+./scripts/run-demo.sh
 
 # 3. Explore results
-./eso-utils.sh status
-./eso-utils.sh externals
+./scripts/eso-utils.sh status
+./scripts/eso-utils.sh externals
 ```
 
 ### Learning Path

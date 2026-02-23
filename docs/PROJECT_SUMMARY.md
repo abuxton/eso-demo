@@ -27,12 +27,12 @@ The main demonstration script that automates the complete ESO demo.
 
 **Usage:**
 ```bash
-./run-demo.sh                           # Run with Azure (default)
-./run-demo.sh --dry-run                 # Preview commands
-./run-demo.sh --provider vault          # Use Vault backend
-./run-demo.sh --skip-aws --skip-azure   # Vault + K8s only
-./run-demo.sh --cleanup-only            # Remove resources
-./run-demo.sh --help                    # Full documentation
+./scripts/run-demo.sh                           # Run with Azure (default)
+./scripts/run-demo.sh --dry-run                 # Preview commands
+./scripts/run-demo.sh --provider vault          # Use Vault backend
+./scripts/run-demo.sh --skip-aws --skip-azure   # Vault + K8s only
+./scripts/run-demo.sh --cleanup-only            # Remove resources
+./scripts/run-demo.sh --help                    # Full documentation
 ```
 
 #### 2. **eso-utils.sh** (8 KB)
@@ -49,13 +49,13 @@ Helper utility script for common ESO operations and inspection.
 
 **Usage:**
 ```bash
-./eso-utils.sh status                        # Overall status
-./eso-utils.sh stores                        # List secret stores
-./eso-utils.sh inspect data-by-name          # Inspect a secret
-./eso-utils.sh decode data-by-name           # Decode values
-./eso-utils.sh switch-provider SECRET STORE  # Switch providers
-./eso-utils.sh logs                          # View ESO logs
-./eso-utils.sh help                          # All commands
+./scripts/eso-utils.sh status                        # Overall status
+./scripts/eso-utils.sh stores                        # List secret stores
+./scripts/eso-utils.sh inspect data-by-name          # Inspect a secret
+./scripts/eso-utils.sh decode data-by-name           # Decode values
+./scripts/eso-utils.sh switch-provider SECRET STORE  # Switch providers
+./scripts/eso-utils.sh logs                          # View ESO logs
+./scripts/eso-utils.sh help                          # All commands
 ```
 
 #### 3. **validate-setup.sh** (8 KB)
@@ -71,7 +71,7 @@ Pre-flight validation script to check prerequisites.
 
 **Usage:**
 ```bash
-./validate-setup.sh
+./scripts/validate-setup.sh
 ```
 
 ---
@@ -152,7 +152,7 @@ EXISTING FILES (Still Works):
 ### ✅ Complete Automation
 From zero to fully functioning ESO demo in one command:
 ```bash
-./run-demo.sh
+./scripts/run-demo.sh
 ```
 
 ### ✅ Educational Output
@@ -180,13 +180,13 @@ All automated and shown sequentially:
 ### ✅ Dry-Run Preview Mode
 See exactly what will happen before it happens:
 ```bash
-./run-demo.sh --dry-run
+./scripts/run-demo.sh --dry-run
 ```
 
 ### ✅ Modular Design
 Run exactly what you need:
 ```bash
-./run-demo.sh --skip-aws --skip-azure --provider vault  # Only Vault
+./scripts/run-demo.sh --skip-aws --skip-azure --provider vault  # Only Vault
 ```
 
 ### ✅ Professional Quality
@@ -203,35 +203,35 @@ Run exactly what you need:
 ### 📚 For Training/Teaching
 ```bash
 # Preview everything for students
-./run-demo.sh --dry-run | less
+./scripts/run-demo.sh --dry-run | less
 
 # Run demo step by-step with narration
-./run-demo.sh --provider vault --no-cleanup
+./scripts/run-demo.sh --provider vault --no-cleanup
 
 # Monitor in real-time
-watch './eso-utils.sh status'
+watch './scripts/eso-utils.sh status'
 ```
 
 ### ⚡ For Quick Testing
 ```bash
 # Fastest setup without AWS/Azure
-./run-demo.sh --provider vault --skip-aws --skip-azure
+./scripts/run-demo.sh --provider vault --skip-aws --skip-azure
 ```
 
 ### 🔍 For Multi-Provider Demo
 ```bash
 # Test each provider
 for provider in azure awssm vault; do
-  ./run-demo.sh --provider $provider --no-cleanup
+  ./scripts/run-demo.sh --provider $provider --no-cleanup
 done
 ```
 
 ### 🏢 For Production Validation
 ```bash
 # Full demo with all providers
-./validate-setup.sh    # Pre-flight check
-./run-demo.sh          # Full deployment
-./eso-utils.sh status  # Verify
+./scripts/validate-setup.sh    # Pre-flight check
+./scripts/run-demo.sh          # Full deployment
+./scripts/eso-utils.sh status  # Verify
 ```
 
 ---
@@ -356,24 +356,24 @@ Total: ~1.5 hours to full competency
 ```bash
 cd /path/to/eso-demo
 cat START_HERE.md              # Read this first
-./validate-setup.sh            # Check prerequisites
+./scripts/validate-setup.sh            # Check prerequisites
 ```
 
 ### Step 2: Learning (10 minutes)
 ```bash
-./run-demo.sh --dry-run | less # See all commands
+./scripts/run-demo.sh --dry-run | less # See all commands
 cat DEMO_GUIDE.md              # Read complete guide
 ```
 
 ### Step 3: Execution (10 minutes)
 ```bash
-./run-demo.sh                  # Run the demo
-./eso-utils.sh status          # Check status
+./scripts/run-demo.sh                  # Run the demo
+./scripts/eso-utils.sh status          # Check status
 ```
 
 ### Step 4: Exploration (Ongoing)
 ```bash
-./eso-utils.sh help            # See all utilities
+./scripts/eso-utils.sh help            # See all utilities
 kubectl get all -n eso-demo    # Explore resources
 ```
 
@@ -390,7 +390,7 @@ For first-time users:
 For comprehensive learning:
   1. DEMO_GUIDE.md
   2. run-demo.sh --dry-run
-  3. Run ./run-demo.sh
+  3. Run ./scripts/run-demo.sh
 
 For technical understanding:
   1. IMPLEMENTATION_SUMMARY.md
@@ -404,7 +404,7 @@ For technical understanding:
 
 1. **Always start with `--dry-run`** to understand the process
 2. **Use `--help` flags** on all scripts
-3. **Monitor with `watch './eso-utils.sh status'`** in parallel terminal
+3. **Monitor with `watch './scripts/eso-utils.sh status'`** in parallel terminal
 4. **Keep resources with `--no-cleanup`** for exploration
 5. **Try different providers** to understand flexibility
 6. **Review logs** with `./eso-utils.sh logs` for troubleshooting
@@ -478,20 +478,20 @@ See DEMO_GUIDE.md for comprehensive troubleshooting.
 
 **Immediate Action (Now):**
 ```bash
-cd /Users/abuxton/src/github/forks/eso-demo
+cd path/to/eso-demo
 cat START_HERE.md
 ```
 
 **Learning & Testing (Next):**
 ```bash
-./validate-setup.sh
-./run-demo.sh --dry-run
-./run-demo.sh
+./scripts/validate-setup.sh
+./scripts/run-demo.sh --dry-run
+./scripts/run-demo.sh
 ```
 
 **Ongoing Usage:**
 ```bash
-./eso-utils.sh    # Explore and understand
+./scripts/eso-utils.sh    # Explore and understand
 cat QUICK_REFERENCE.md  # Quick lookup
 ```
 

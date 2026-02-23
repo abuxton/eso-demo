@@ -41,21 +41,21 @@ Before running the demo script, ensure you have:
 
 #### 1. **View Help** (Recommended First Step)
 ```bash
-./run-demo.sh --help
+./scripts/run-demo.sh --help
 ```
 
 This shows all available options and examples.
 
 #### 2. **Preview Mode (Dry-Run)**
 ```bash
-./run-demo.sh --dry-run
+./scripts/run-demo.sh --dry-run
 ```
 
 This displays all commands that would be executed without actually running them. Perfect for training and understanding the process.
 
 #### 3. **Run Full Demo with Default Provider (Azure)**
 ```bash
-./run-demo.sh
+./scripts/run-demo.sh
 ```
 
 This runs the complete demo with Azure Key Vault as the external provider.
@@ -63,42 +63,42 @@ This runs the complete demo with Azure Key Vault as the external provider.
 #### 4. **Run with Specific Provider**
 ```bash
 # Using Vault Backend
-./run-demo.sh --provider vault
+./scripts/run-demo.sh --provider vault
 
 # Using AWS Secrets Manager
-./run-demo.sh --provider awssm
+./scripts/run-demo.sh --provider awssm
 
 # Using AWS Parameter Store
-./run-demo.sh --provider awsps
+./scripts/run-demo.sh --provider awsps
 
 # Using Kubernetes Provider (simulated multi-cluster)
-./run-demo.sh --provider k8s
+./scripts/run-demo.sh --provider k8s
 ```
 
 #### 5. **Skip Specific Components**
 ```bash
 # Skip Azure infrastructure setup
-./run-demo.sh --skip-azure
+./scripts/run-demo.sh --skip-azure
 
 # Skip Vault setup
-./run-demo.sh --skip-vault
+./scripts/run-demo.sh --skip-vault
 
 # Skip all Terraform-based infrastructure
-./run-demo.sh --skip-tf
+./scripts/run-demo.sh --skip-tf
 
 # Useful for: Quick testing, no AWS account, no Azure subscription, etc.
 ```
 
 #### 6. **Just Cleanup Resources**
 ```bash
-./run-demo.sh --cleanup-only
+./scripts/run-demo.sh --cleanup-only
 ```
 
 This removes all demo resources without running the demo again.
 
 #### 7. **Preserve Resources After Demo**
 ```bash
-./run-demo.sh --no-cleanup
+./scripts/run-demo.sh --no-cleanup
 ```
 
 This runs the full demo but doesn't ask about cleanup at the end, leaving resources in your cluster.
@@ -146,40 +146,40 @@ A companion utility script for common ESO operations during and after the demo.
 
 ```bash
 # Show overall status
-./eso-utils.sh status
+./scripts/eso-utils.sh status
 
 # List all synced secrets
-./eso-utils.sh secrets
+./scripts/eso-utils.sh secrets
 
 # List ClusterSecretStores
-./eso-utils.sh stores
+./scripts/eso-utils.sh stores
 
 # Inspect a specific secret
-./eso-utils.sh inspect data-by-name
+./scripts/eso-utils.sh inspect data-by-name
 
 # Decode secret values
-./eso-utils.sh decode data-by-name
+./scripts/eso-utils.sh decode data-by-name
 
 # Switch a secret to use a different provider
-./eso-utils.sh switch-provider data-by-name vault-secret-store
+./scripts/eso-utils.sh switch-provider data-by-name vault-secret-store
 
 # View ExternalSecretes status
-./eso-utils.sh externals
+./scripts/eso-utils.sh externals
 
 # View Generators
-./eso-utils.sh generators
+./scripts/eso-utils.sh generators
 
 # Check if syncing is working
-./eso-utils.sh test-sync
+./scripts/eso-utils.sh test-sync
 
 # View ESO operator logs
-./eso-utils.sh logs
+./scripts/eso-utils.sh logs
 
 # Setup port-forward to Vault
-./eso-utils.sh vault
+./scripts/eso-utils.sh vault
 
 # Full help
-./eso-utils.sh help
+./scripts/eso-utils.sh help
 ```
 
 ## Common Use Cases
@@ -188,68 +188,68 @@ A companion utility script for common ESO operations during and after the demo.
 
 ```bash
 # On your presentation machine:
-./run-demo.sh --dry-run
+./scripts/run-demo.sh --dry-run
 
 # This shows all commands students should understand.
 # Then explain each section and why it's needed.
 
 # In a terminal on the side, run:
-./run-demo.sh
+./scripts/run-demo.sh
 
 # And use eso-utils to show status live:
-watch -n 2 './eso-utils.sh status'
+watch -n 2 './scripts/eso-utils.sh status'
 ```
 
 ### Use Case 2: Multi-Provider Comparison
 
 ```bash
 # Setup the demo
-./run-demo.sh --provider azure
+./scripts/run-demo.sh --provider azure
 
 # After demo completes, try switching manually:
-./eso-utils.sh switch-provider data-by-name awssm-secret-store
+./scripts/eso-utils.sh switch-provider data-by-name awssm-secret-store
 
 # Check the value changed but ExternalSecret didn't:
-./eso-utils.sh decode data-by-name
+./scripts/eso-utils.sh decode data-by-name
 ```
 
 ### Use Case 3: Quick Testing (Skip AWS/Azure)
 
 ```bash
 # Just test with Vault and Kubernetes providers
-./run-demo.sh --provider vault --skip-aws --skip-azure
+./scripts/run-demo.sh --provider vault --skip-aws --skip-azure
 ```
 
 ### Use Case 4: Understand Each Step
 
 ```bash
 # 1. First, preview all commands:
-./run-demo.sh --dry-run | tee demo-commands.log
+./scripts/run-demo.sh --dry-run | tee demo-commands.log
 
 # 2. Run the demo slowly (with watches):
-./run-demo.sh
+./scripts/run-demo.sh
 
 # 3. Monitor effects in real-time:
-watch -n 1 './eso-utils.sh externals'
+watch -n 1 './scripts/eso-utils.sh externals'
 
 # 4. Inspect individual resources:
-./eso-utils.sh inspect data-by-name
-./eso-utils.sh logs externalsecret
+./scripts/eso-utils.sh inspect data-by-name
+./scripts/eso-utils.sh logs externalsecret
 ```
 
 ### Use Case 5: Validate Installation Post-Demo
 
 ```bash
 # Check if everything worked:
-./eso-utils.sh test-sync
+./scripts/eso-utils.sh test-sync
 
 # View what was created:
-./eso-utils.sh stores
-./eso-utils.sh externals
-./eso-utils.sh secrets
+./scripts/eso-utils.sh stores
+./scripts/eso-utils.sh externals
+./scripts/eso-utils.sh secrets
 
 # View logs for any errors:
-./eso-utils.sh logs
+./scripts/eso-utils.sh logs
 ```
 
 ## Command Output Explanation
@@ -330,9 +330,9 @@ az account show
 
 **Solution**: Check status and logs:
 ```bash
-./eso-utils.sh status
-./eso-utils.sh logs
-./eso-utils.sh test-sync
+./scripts/eso-utils.sh status
+./scripts/eso-utils.sh logs
+./scripts/eso-utils.sh test-sync
 ```
 
 ### Problem: "Cleanup failed"
@@ -353,14 +353,14 @@ kubectl delete ns eso-demo cred remote-cluster
 
 ```bash
 # 1. Install just ESO
-./run-demo.sh --dry-run --skip-aws --skip-azure | head -30
+./scripts/run-demo.sh --dry-run --skip-aws --skip-azure | head -30
 
 # 2. Setup infrastructure
-./run-demo.sh --skip-aws --skip-azure --provider vault
+./scripts/run-demo.sh --skip-aws --skip-azure --provider vault
 
 # 3. Inspect what was created
-./eso-utils.sh stores
-./eso-utils.sh externals
+./scripts/eso-utils.sh stores
+./scripts/eso-utils.sh externals
 
 # 4. Manually demo switching
 kubectl edit externalsecret data-by-name -n eso-demo
@@ -372,8 +372,8 @@ kubectl edit externalsecret data-by-name -n eso-demo
 # Run demo with each provider
 for provider in azure awssm vault k8s; do
   echo "Testing with $provider..."
-  ./run-demo.sh --provider $provider --no-cleanup
-  ./eso-utils.sh status
+  ./scripts/run-demo.sh --provider $provider --no-cleanup
+  ./scripts/eso-utils.sh status
   read -p "Press Enter to continue..."
 done
 ```
@@ -382,12 +382,12 @@ done
 
 ```bash
 # Capture all commands to a file
-./run-demo.sh --dry-run > training-commands.txt
+./scripts/run-demo.sh --dry-run > training-commands.txt
 
 # Capture status snapshots
-./eso-utils.sh status > before-demo.txt
-./run-demo.sh
-./eso-utils.sh status > after-demo.txt
+./scripts/eso-utils.sh status > before-demo.txt
+./scripts/run-demo.sh
+./scripts/eso-utils.sh status > after-demo.txt
 
 # View changes
 diff before-demo.txt after-demo.txt

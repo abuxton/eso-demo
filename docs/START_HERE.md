@@ -6,16 +6,16 @@ Welcome! This guide will help you get started with the automated ESO demo in min
 
 ```bash
 # 1. Check if everything is ready
-./validate-setup.sh
+./scripts/validate-setup.sh
 
 # 2. Preview the demo (dry-run mode)
-./run-demo.sh --dry-run
+./scripts/run-demo.sh --dry-run
 
 # 3. Run the full demo
-./run-demo.sh
+./scripts/run-demo.sh
 
 # 4. Explore the results
-./eso-utils.sh status
+./scripts/eso-utils.sh status
 ```
 
 Done! ✅
@@ -36,7 +36,7 @@ The demo will automatically:
 
 ### Step 1: Check Prerequisites
 ```bash
-./validate-setup.sh
+./scripts/validate-setup.sh
 ```
 
 This will verify:
@@ -75,43 +75,43 @@ kubectl cluster-info
 
 ### The Fastest Way (30 seconds)
 ```bash
-./run-demo.sh
+./scripts/run-demo.sh
 ```
 
 ### For Training/Teaching (5 minutes)
 ```bash
 # First, preview all commands
-./run-demo.sh --dry-run | less
+./scripts/run-demo.sh --dry-run | less
 
 # Then run with Vault only (faster setup)
-./run-demo.sh --provider vault --skip-aws --skip-azure
+./scripts/run-demo.sh --provider vault --skip-aws --skip-azure
 ```
 
 ### For Specific Provider Testing
 ```bash
 # Azure Key Vault (default)
-./run-demo.sh --provider azure
+./scripts/run-demo.sh --provider azure
 
 # AWS Secrets Manager
-./run-demo.sh --provider awssm
+./scripts/run-demo.sh --provider awssm
 
 # HashiCorp Vault
-./run-demo.sh --provider vault
+./scripts/run-demo.sh --provider vault
 
 # Kubernetes (multi-cluster simulation)
-./run-demo.sh --provider k8s
+./scripts/run-demo.sh --provider k8s
 ```
 
 ### For Professional Demos
 ```bash
 # Show every step with dry-run
-./run-demo.sh --dry-run
+./scripts/run-demo.sh --dry-run
 
 # Run with annotations
-./run-demo.sh --provider vault --no-cleanup
+./scripts/run-demo.sh --provider vault --no-cleanup
 
 # Narrate what you see
-./eso-utils.sh status
+./scripts/eso-utils.sh status
 ```
 
 ## 📖 Understanding the Output
@@ -133,31 +133,31 @@ This is intentional for **transparency and learning**. You can:
 
 ### Check Status Anytime
 ```bash
-./eso-utils.sh status
+./scripts/eso-utils.sh status
 ```
 
 ### See What Was Created
 ```bash
-./eso-utils.sh stores         # ClusterSecretStores
-./eso-utils.sh externals      # ExternalSecrets
-./eso-utils.sh secrets        # Synced Secrets
-./eso-utils.sh generators     # Generated Secrets
+./scripts/eso-utils.sh stores         # ClusterSecretStores
+./scripts/eso-utils.sh externals      # ExternalSecrets
+./scripts/eso-utils.sh secrets        # Synced Secrets
+./scripts/eso-utils.sh generators     # Generated Secrets
 ```
 
 ### Inspect a Secret
 ```bash
-./eso-utils.sh inspect data-by-name
-./eso-utils.sh decode data-by-name
+./scripts/eso-utils.sh inspect data-by-name
+./scripts/eso-utils.sh decode data-by-name
 ```
 
 ### Switch Providers
 ```bash
-./eso-utils.sh switch-provider data-by-name vault-secret-store
+./scripts/eso-utils.sh switch-provider data-by-name vault-secret-store
 ```
 
 ### View Logs
 ```bash
-./eso-utils.sh logs
+./scripts/eso-utils.sh logs
 ```
 
 ## 🧹 Cleanup
@@ -166,7 +166,7 @@ The script will ask if you want to clean up at the end. Or manually:
 
 ```bash
 # Remove just the demo resources
-./run-demo.sh --cleanup-only
+./scripts/run-demo.sh --cleanup-only
 
 # Manual cleanup (if needed)
 kubectl delete ns eso-demo cred remote-cluster external-secrets vault
@@ -226,13 +226,13 @@ nano .env  # Add your credentials
 ### Issue: "ExternalSecrets not syncing"
 ```bash
 # Check them:
-./eso-utils.sh test-sync
+./scripts/eso-utils.sh test-sync
 
 # View logs:
-./eso-utils.sh logs
+./scripts/eso-utils.sh logs
 
 # Full guide:
-./run-demo.sh --help
+./scripts/run-demo.sh --help
 ```
 
 ## 💡 Pro Tips
@@ -240,7 +240,7 @@ nano .env  # Add your credentials
 1. **Learn First**: Run with `--dry-run` to see all commands
 2. **Safe Testing**: Use `--skip-aws --skip-azure` for fast setup
 3. **Keep Resources**: Use `--no-cleanup` to explore afterward
-4. **Live Monitoring**: Open new terminal with `watch './eso-utils.sh status'`
+4. **Live Monitoring**: Open new terminal with `watch './scripts/eso-utils.sh status'`
 5. **Training Mode**: Print with `--dry-run > commands.txt` and follow along
 
 ## 🎓 Learning Path
@@ -299,9 +299,9 @@ Learn about secret generation with Passwords and Fake data
 
 **Ready to go?**
 ```bash
-./validate-setup.sh    # Check prerequisites (2 min)
-./run-demo.sh --help   # See all options (30 sec)
-./run-demo.sh          # Run the demo! (10 min)
+./scripts/validate-setup.sh    # Check prerequisites (2 min)
+./scripts/run-demo.sh --help   # See all options (30 sec)
+./scripts/run-demo.sh          # Run the demo! (10 min)
 ```
 
 **Want to learn more?**
@@ -312,9 +312,9 @@ Learn about secret generation with Passwords and Fake data
 ## 📞 Need Help?
 
 1. **First Time?** Check this file again
-2. **Setup Issues?** Run `./validate-setup.sh`
-3. **During Demo?** Check logs with `./eso-utils.sh logs`
-4. **After Demo?** Use `./eso-utils.sh status`
+2. **Setup Issues?** Run `./scripts/validate-setup.sh`
+3. **During Demo?** Check logs with `./scripts/eso-utils.sh logs`
+4. **After Demo?** Use `./scripts/eso-utils.sh status`
 5. **Troubleshooting?** See DEMO_GUIDE.md section
 
 ## 📝 Scripts Included
@@ -327,9 +327,9 @@ Learn about secret generation with Passwords and Fake data
 
 All scripts have `--help`:
 ```bash
-./run-demo.sh --help
-./eso-utils.sh help
-./validate-setup.sh --help
+./scripts/run-demo.sh --help
+./scripts/eso-utils.sh help
+./scripts/validate-setup.sh --help
 ```
 
 ---
@@ -338,17 +338,17 @@ All scripts have `--help`:
 
 **For training:**
 ```bash
-./run-demo.sh --dry-run
+./scripts/run-demo.sh --dry-run
 ```
 
 **For learning:**
 ```bash
-./run-demo.sh --provider vault --no-cleanup
+./scripts/run-demo.sh --provider vault --no-cleanup
 ```
 
 **For testing:**
 ```bash
-./run-demo.sh
+./scripts/run-demo.sh
 ```
 
 **Any questions?** Check [DEMO_GUIDE.md](DEMO_GUIDE.md) or run the scripts with `--help`.

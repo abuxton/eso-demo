@@ -4,17 +4,17 @@
 
 ```bash
 # View help
-./run-demo.sh --help
-./eso-utils.sh help
+./scripts/run-demo.sh --help
+./scripts/eso-utils.sh help
 
 # Preview all commands (no execution)
-./run-demo.sh --dry-run
+./scripts/run-demo.sh --dry-run
 
 # Run full demo
-./run-demo.sh
+./scripts/run-demo.sh
 
 # Just cleanup
-./run-demo.sh --cleanup-only
+./scripts/run-demo.sh --cleanup-only
 ```
 
 ## 🚀 Quick Start by Scenario
@@ -22,48 +22,48 @@
 ### Training / Classroom Demo
 ```bash
 # Option 1: Preview mode (show what will happen)
-./run-demo.sh --dry-run | less
+./scripts/run-demo.sh --dry-run | less
 
 # Option 2: Run and narrate
-./run-demo.sh --provider vault  # Use Vault for simplicity
+./scripts/run-demo.sh --provider vault  # Use Vault for simplicity
 
 # Option 3: Live monitoring in another terminal
-watch -n 2 './eso-utils.sh status'
+watch -n 2 './scripts/eso-utils.sh status'
 ```
 
 ### Fast Testing (No AWS/Azure)
 ```bash
-./run-demo.sh --provider vault --skip-aws --skip-azure
+./scripts/run-demo.sh --provider vault --skip-aws --skip-azure
 ```
 
 ### All Providers Demo
 ```bash
-./run-demo.sh --provider awssm   # AWS Secrets Manager
-./run-demo.sh --provider awsps   # AWS Parameter Store
-./run-demo.sh --provider azure   # Azure Key Vault
-./run-demo.sh --provider vault   # HashiCorp Vault
-./run-demo.sh --provider k8s     # Kubernetes (multi-cluster sim)
+./scripts/run-demo.sh --provider awssm   # AWS Secrets Manager
+./scripts/run-demo.sh --provider awsps   # AWS Parameter Store
+./scripts/run-demo.sh --provider azure   # Azure Key Vault
+./scripts/run-demo.sh --provider vault   # HashiCorp Vault
+./scripts/run-demo.sh --provider k8s     # Kubernetes (multi-cluster sim)
 ```
 
 ## 🔍 Inspection Commands
 
 | Command | Purpose |
 |---------|---------|
-| `./eso-utils.sh status` | Overall demo status |
-| `./eso-utils.sh stores` | List ClusterSecretStores |
-| `./eso-utils.sh externals` | List ExternalSecrets |
-| `./eso-utils.sh secrets` | List synced Secrets |
-| `./eso-utils.sh inspect SECRET_NAME` | Show secret details |
-| `./eso-utils.sh decode SECRET_NAME` | Decode base64 values |
-| `./eso-utils.sh test-sync` | Check sync status |
-| `./eso-utils.sh logs` | View ESO operator logs |
+| `./scripts/eso-utils.sh status` | Overall demo status |
+| `./scripts/eso-utils.sh stores` | List ClusterSecretStores |
+| `./scripts/eso-utils.sh externals` | List ExternalSecrets |
+| `./scripts/eso-utils.sh secrets` | List synced Secrets |
+| `./scripts/eso-utils.sh inspect SECRET_NAME` | Show secret details |
+| `./scripts/eso-utils.sh decode SECRET_NAME` | Decode base64 values |
+| `./scripts/eso-utils.sh test-sync` | Check sync status |
+| `./scripts/eso-utils.sh logs` | View ESO operator logs |
 
 ## 🔄 Advanced Operations
 
 ### Switch Providers
 ```bash
 # Manually (quick)
-./eso-utils.sh switch-provider data-by-name vault-secret-store
+./scripts/eso-utils.sh switch-provider data-by-name vault-secret-store
 
 # Watch the effect
 watch 'kubectl get secret data-by-name -n eso-demo -o jsonpath={.data.secret-value} | base64 -d'
@@ -72,10 +72,10 @@ watch 'kubectl get secret data-by-name -n eso-demo -o jsonpath={.data.secret-val
 ### Monitor in Real-Time
 ```bash
 # Terminal 1: Run demo
-./run-demo.sh
+./scripts/run-demo.sh
 
 # Terminal 2: Watch resources
-watch -n 1 './eso-utils.sh externals'
+watch -n 1 './scripts/eso-utils.sh externals'
 
 # Terminal 3: Watch logs
 kubectl logs -n external-secrets deployment/external-secrets -f
@@ -83,8 +83,8 @@ kubectl logs -n external-secrets deployment/external-secrets -f
 
 ### Deploy to Cloud (Vault)
 ```bash
-./run-demo.sh --provider vault --no-cleanup
-./eso-utils.sh vault  # Opens port-forward to Vault UI
+./scripts/run-demo.sh --provider vault --no-cleanup
+./scripts/eso-utils.sh vault  # Opens port-forward to Vault UI
 ```
 
 ## ⚙️ Configuration
@@ -118,7 +118,7 @@ terraform --version
 | Missing tools | `brew install helm terraform jq` |
 | AWS credentials fail | `aws configure` + update `.env` |
 | Azure credentials fail | `az login` + update `.env` |
-| ExternalSecrets not syncing | `./eso-utils.sh test-sync` |
+| ExternalSecrets not syncing | `./scripts/eso-utils.sh test-sync` |
 | Need to cleanup | `./run-demo.sh --cleanup-only` |
 
 ## 📊 What Each Demo Shows
@@ -178,16 +178,16 @@ kubectl delete ns eso-demo cred remote-cluster external-secrets vault
 
 ```bash
 # Show everything
-./run-demo.sh --dry-run | tee demo.log
+./scripts/run-demo.sh --dry-run | tee demo.log
 
 # Quick with Vault only
-./run-demo.sh --provider vault --skip-aws --skip-azure --no-cleanup
+./scripts/run-demo.sh --provider vault --skip-aws --skip-azure --no-cleanup
 
 # Monitor during run
 watch 'kubectl get externalsecret,secret -A | grep -v "^kube-"'
 
 # Cleanup & start fresh
-./run-demo.sh --cleanup-only && ./run-demo.sh --provider azure
+./scripts/run-demo.sh --cleanup-only && ./scripts/run-demo.sh --provider azure
 
 # Export all secret values
 kubectl get secret -n eso-demo -o json | jq '.items[] | {name: .metadata.name, keys: .data | keys}'
