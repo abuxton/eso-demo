@@ -5,7 +5,7 @@ resource "azuread_application" "eso-app" {
 }
 
 resource "azuread_service_principal" "eso-app" {
-  application_id               = azuread_application.eso-app.application_id
+  application_id               = azuread_application.eso-app.client_id
   app_role_assignment_required = false
   owners                       = [data.azurerm_client_config.current.object_id]
   feature_tags {

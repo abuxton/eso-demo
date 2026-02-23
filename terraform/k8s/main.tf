@@ -2,13 +2,14 @@ terraform {
   required_providers {
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "2.20.0"
+      version = "~>3"
     }
   }
 }
 
 provider "kubernetes" {
-  # Configuration from current config for minikube
-  config_path    = "~/.kube/config"
-  config_context = "minikube"
+  # Use the current kubectl context from ~/.kube/config
+  # This works with any cluster (minikube, rancher-desktop, EKS, AKS, etc.)
+  config_path = "~/.kube/config"
+  # Removed config_context to use current context by default
 }

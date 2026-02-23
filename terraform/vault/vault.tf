@@ -6,8 +6,10 @@ resource "helm_release" "vault" {
 
   create_namespace = "true"
 
-  set {
-    name  = "server.dev.enabled"
-    value = "true"
-  }
+  set = [
+    {
+      name  = "server.dev.enabled"
+      value = "true"
+    }
+  ]
 }
