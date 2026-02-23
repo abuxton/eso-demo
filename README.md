@@ -7,6 +7,45 @@
 
 A **production-ready, fully automated demo** of the [External Secrets Operator](https://external-secrets.io) with multiple secret providers, comprehensive documentation, and hands-on examples.
 
+- [🔐 External Secrets Operator (ESO) - Complete Automated Demo](#-external-secrets-operator-eso---complete-automated-demo)
+	- [✨ What This Demo Includes](#-what-this-demo-includes)
+		- [🎯 4 Complete Demo Scenarios](#-4-complete-demo-scenarios)
+		- [🚀 Supported Providers](#-supported-providers)
+		- [🛠️ Complete Automation](#️-complete-automation)
+	- [📋 Prerequisites](#-prerequisites)
+	- [🚀 Quick Start (5 minutes)](#-quick-start-5-minutes)
+		- [1. Validate Your Setup](#1-validate-your-setup)
+		- [2. Configure Environment Variables (if using AWS/Azure)](#2-configure-environment-variables-if-using-awsazure)
+		- [3. Preview the Demo (Dry-Run)](#3-preview-the-demo-dry-run)
+		- [4. Run the Full Demo](#4-run-the-full-demo)
+		- [5. Monitor the Demo](#5-monitor-the-demo)
+	- [📖 Documentation Guide](#-documentation-guide)
+		- [🎯 Where to Start](#-where-to-start)
+		- [🔍 Deep Dives](#-deep-dives)
+	- [📁 Project Structure](#-project-structure)
+	- [🎮 Using the Demo Scripts](#-using-the-demo-scripts)
+		- [Main Script: `./scripts/run-demo.sh`](#main-script-scriptsrun-demosh)
+		- [Utility Script: `./scripts/eso-utils.sh`](#utility-script-scriptseso-utilssh)
+		- [Setup Validation: `./scripts/validate-setup.sh`](#setup-validation-scriptsvalidate-setupsh)
+	- [🔄 Demo Workflow](#-demo-workflow)
+	- [📊 Understanding the Demos](#-understanding-the-demos)
+		- [Demo 1: Pull Secrets from External Providers ✅](#demo-1-pull-secrets-from-external-providers-)
+		- [Demo 2: Switch Providers Dynamically ✅](#demo-2-switch-providers-dynamically-)
+		- [Demo 3: Push Secrets to External Providers ✅](#demo-3-push-secrets-to-external-providers-)
+		- [Demo 4: Generate Secrets ✅](#demo-4-generate-secrets-)
+	- [✅ Success: Verify Demo Results](#-success-verify-demo-results)
+	- [🐛 Troubleshooting](#-troubleshooting)
+		- [Common Issues](#common-issues)
+		- [Debug Commands](#debug-commands)
+	- [📚 Additional Resources](#-additional-resources)
+		- [External Docs](#external-docs)
+		- [Related Demos](#related-demos)
+	- [📝 Project History](#-project-history)
+	- [👨‍💻 Contributing](#-contributing)
+	- [📄 License](#-license)
+	- [🎯 Quick Links](#-quick-links)
+
+
 ## ✨ What This Demo Includes
 
 This repository provides an **end-to-end automated demo** that showcases:
@@ -87,6 +126,11 @@ cp .env.template .env
 ```bash
 source .env  # Load AWS/Azure credentials
 ./scripts/run-demo.sh
+```
+
+**Option C: common run locally only**
+```bash
+./scripts/run-demo.sh --provider k8s --skip-tf --skip-azure --skip-aws
 ```
 
 ### 5. Monitor the Demo
