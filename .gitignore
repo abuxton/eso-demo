@@ -2,3 +2,4 @@ no_push/
 
 .terraform*
 terraform.tfstate*
+.env
