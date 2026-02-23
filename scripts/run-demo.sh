@@ -10,7 +10,7 @@
 # 4. Generate secrets using Generators (Password & Fake)
 #
 # Usage:
-#   ./run-demo.sh [OPTIONS]
+#   ./scripts/run-demo.sh [OPTIONS]
 #
 # Options:
 #   --help                Show this help message
@@ -25,10 +25,10 @@
 #   --no-cleanup          Don't run cleanup at the end
 #
 # Examples:
-#   ./run-demo.sh                          # Run full demo with Azure (default)
-#   ./run-demo.sh --dry-run                # Preview all commands
-#   ./run-demo.sh --provider vault         # Run with Vault provider
-#   ./run-demo.sh --dry-run --provider aws # Preview AWS commands
+#   ./scripts/run-demo.sh                          # Run full demo with Azure (default)
+#   ./scripts/run-demo.sh --dry-run                # Preview all commands
+#   ./scripts/run-demo.sh --provider vault         # Run with Vault provider
+#   ./scripts/run-demo.sh --dry-run --provider aws # Preview AWS commands
 #
 # Prerequisites:
 #   - kubectl configured and connected to a cluster (rancher-desktop, minikube, etc.)
@@ -83,7 +83,7 @@ print_help() {
 ╚════════════════════════════════════════════════════════════════════════════╝
 
 USAGE:
-  ./run-demo.sh [OPTIONS]
+  ./scripts/run-demo.sh [OPTIONS]
 
 OPTIONS:
   --help              Show this help message
@@ -101,19 +101,19 @@ OPTIONS:
 EXAMPLES:
 
   # Run full demo with Azure provider (default)
-  ./run-demo.sh
+  ./scripts/run-demo.sh
 
   # Preview all commands with --dry-run
-  ./run-demo.sh --dry-run
+  ./scripts/run-demo.sh --dry-run
 
   # Run demo with Vault backend
-  ./run-demo.sh --provider vault
+  ./scripts/run-demo.sh --provider vault
 
   # Preview AWS commands with dry-run
-  ./run-demo.sh --dry-run --provider awssm
+  ./scripts/run-demo.sh --dry-run --provider awssm
 
   # Just cleanup resources
-  ./run-demo.sh --cleanup-only
+  ./scripts/run-demo.sh --cleanup-only
 
 PREREQUISITES:
   ✓ kubectl configured and connected to a Kubernetes cluster
