@@ -64,6 +64,7 @@ CLEANUP_ONLY=false
 
 # Script configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"  # Parent directory (project root)
 DEMO_NAMESPACE="eso-demo"
 CRED_NAMESPACE="cred"
 REMOTE_K8S_NAMESPACE="remote-cluster"
@@ -481,7 +482,7 @@ setup_aws() {
 
     print_step "Setting Up AWS Infrastructure with Terraform"
 
-    local tf_dir="$SCRIPT_DIR/terraform/aws"
+    local tf_dir="$PROJECT_DIR/terraform/aws"
 
     if [[ ! -d "$tf_dir" ]]; then
         print_error "AWS terraform directory not found: $tf_dir"
@@ -540,7 +541,7 @@ setup_azure() {
 
     print_step "Setting Up Azure Infrastructure with Terraform"
 
-    local tf_dir="$SCRIPT_DIR/terraform/azure"
+    local tf_dir="$PROJECT_DIR/terraform/azure"
 
     if [[ ! -d "$tf_dir" ]]; then
         print_error "Azure terraform directory not found: $tf_dir"
@@ -601,7 +602,7 @@ setup_kubernetes_provider() {
 
     print_step "Setting Up Kubernetes Provider Infrastructure"
 
-    local tf_dir="$SCRIPT_DIR/terraform/k8s"
+    local tf_dir="$PROJECT_DIR/terraform/k8s"
 
     if [[ ! -d "$tf_dir" ]]; then
         print_error "K8s terraform directory not found: $tf_dir"
@@ -645,7 +646,7 @@ create_clustersecretstores() {
         print_info "Creating Azure ClusterSecretStore..."
         if [[ "$DRY_RUN" == false ]]; then
             VAULT_URL="${VAULT_URL:-}" TENANT_ID="${TENANT_ID:-}" \
-            eval "echo \"$(cat $SCRIPT_DIR/ClusterSecretStores/azure-key-vault/azure_secretstore.template.yaml)\"" | \
+            eval "echo \"$(cat $PROJECT_DIR/ClusterSecretStores/azure-key-vault/azure_secretstore.template.yaml)\"" | \
             kubectl apply -f - 2>/dev/null || print_warning "Azure ClusterSecretStore creation skipped (credentials missing)"
         else
             print_info "$ kubectl apply -f ClusterSecretStores/azure-key-vault/azure_secretstore.template.yaml"
@@ -657,7 +658,7 @@ create_clustersecretstores() {
         print_info "Creating AWS Secrets Manager ClusterSecretStore..."
         if [[ "$DRY_RUN" == false ]]; then
             AWS_REGION="${AWS_REGION:-us-east-1}" \
-            eval "echo \"$(cat $SCRIPT_DIR/ClusterSecretStores/aws/awssm_secretstore.template.yaml)\"" | \
+            eval "echo \"$(cat $PROJECT_DIR/ClusterSecretStores/aws/awssm_secretstore.template.yaml)\"" | \
             kubectl apply -f - 2>/dev/null || print_warning "AWS SM ClusterSecretStore creation skipped (credentials missing)"
         else
             print_info "$ kubectl apply -f ClusterSecretStores/aws/awssm_secretstore.template.yaml"
@@ -669,7 +670,7 @@ create_clustersecretstores() {
         print_info "Creating AWS Parameter Store ClusterSecretStore..."
         if [[ "$DRY_RUN" == false ]]; then
             AWS_REGION="${AWS_REGION:-us-east-1}" \
-            eval "echo \"$(cat $SCRIPT_DIR/ClusterSecretStores/aws/awsps_secretstore.template.yaml)\"" | \
+            eval "echo \"$(cat $PROJECT_DIR/ClusterSecretStores/aws/awsps_secretstore.template.yaml)\"" | \
             kubectl apply -f - 2>/dev/null || print_warning "AWS PS ClusterSecretStore creation skipped (credentials missing)"
         else
             print_info "$ kubectl apply -f ClusterSecretStores/aws/awsps_secretstore.template.yaml"
@@ -680,7 +681,7 @@ create_clustersecretstores() {
     if [[ "$SKIP_VAULT" == false ]]; then
         print_info "Creating Vault ClusterSecretStore..."
         run_command \
-            "kubectl apply -f $SCRIPT_DIR/ClusterSecretStores/hashicorp-vault/vault-secretstore.yaml" \
+            "kubectl apply -f $PROJECT_DIR/ClusterSecretStores/hashicorp-vault/vault-secretstore.yaml" \
             "Create Vault ClusterSecretStore"
     fi
 
@@ -689,7 +690,7 @@ create_clustersecretstores() {
         print_info "Creating Kubernetes ClusterSecretStore..."
         if [[ "$DRY_RUN" == false ]]; then
             CLUSTER_IP="${CLUSTER_IP:-}" CLUSTER_PORT="${CLUSTER_PORT:-6443}" \
-            eval "echo \"$(cat $SCRIPT_DIR/ClusterSecretStores/kubernetes/k8s-secretstore.template.yaml)\"" | \
+            eval "echo \"$(cat $PROJECT_DIR/ClusterSecretStores/kubernetes/k8s-secretstore.template.yaml)\"" | \
             kubectl apply -f - 2>/dev/null || print_warning "K8s ClusterSecretStore creation skipped (cluster info missing)"
         else
             print_info "$ kubectl apply -f ClusterSecretStores/kubernetes/k8s-secretstore.template.yaml"
@@ -713,7 +714,7 @@ run_demo_1_pull_secrets() {
     print_info "Provider: $PROVIDER"
 
     run_command \
-        "cd $SCRIPT_DIR && for file in ./ExternalSecrets/*; do
+        "cd $PROJECT_DIR && for file in ./ExternalSecrets/*; do
     if [ -f \"\$file\" ]; then
         provider_store=\"\${PROVIDER}-secret-store\"
         cat \"\$file\" | sed \"s/\\\$provider-secret-store/\$provider_store/g\" | kubectl apply -f - 2>/dev/null
@@ -815,7 +816,7 @@ run_demo_3_push_secrets() {
     print_info "This demo shows how PushSecrets can push Secrets from the cluster to external providers"
 
     run_command \
-        "kubectl apply -f $SCRIPT_DIR/PushSecrets/data-by-name.yaml" \
+        "kubectl apply -f $PROJECT_DIR/PushSecrets/data-by-name.yaml" \
         "Apply PushSecret and Secret resources"
 
     if [[ "$DRY_RUN" == false ]]; then
@@ -845,7 +846,7 @@ run_demo_4_generators() {
     print_info "This demo shows how to use Generators (Password and Fake) to create secrets"
 
     run_command \
-        "kubectl apply -f $SCRIPT_DIR/Generators/" \
+        "kubectl apply -f $PROJECT_DIR/Generators/" \
         "Apply Generator resources"
 
     if [[ "$DRY_RUN" == false ]]; then
@@ -905,6 +906,10 @@ cleanup_demo() {
         print_info "$ kubectl delete -n $DEMO_NAMESPACE pushsecret --all"
         print_info "$ kubectl delete clustersecretstore --all"
         print_info "$ kubectl delete ns $DEMO_NAMESPACE $CRED_NAMESPACE"
+        [[ "$SKIP_AWS" == false && "$SKIP_TF" == false ]] && print_info "$ cd $PROJECT_DIR/terraform/aws && terraform destroy -auto-approve"
+        [[ "$SKIP_AZURE" == false && "$SKIP_TF" == false ]] && print_info "$ cd $PROJECT_DIR/terraform/azure && terraform destroy -auto-approve"
+        [[ "$SKIP_K8S" == false && "$SKIP_TF" == false ]] && print_info "$ cd $PROJECT_DIR/terraform/k8s && terraform destroy -auto-approve"
+        [[ "$SKIP_VAULT" == false && "$SKIP_TF" == false ]] && print_info "$ cd $PROJECT_DIR/terraform/vault && terraform destroy -auto-approve"
         return 0
     fi
 
@@ -925,6 +930,27 @@ cleanup_demo() {
 
     print_info "Deleting namespaces..."
     kubectl delete ns $DEMO_NAMESPACE $CRED_NAMESPACE $REMOTE_K8S_NAMESPACE || true
+
+    # Destroy Terraform infrastructure
+    if [[ "$SKIP_AWS" == false && "$SKIP_TF" == false ]]; then
+        print_info "Destroying AWS infrastructure..."
+        cd "$PROJECT_DIR/terraform/aws" && terraform destroy -auto-approve || true
+    fi
+
+    if [[ "$SKIP_AZURE" == false && "$SKIP_TF" == false ]]; then
+        print_info "Destroying Azure infrastructure..."
+        cd "$PROJECT_DIR/terraform/azure" && terraform destroy -auto-approve || true
+    fi
+
+    if [[ "$SKIP_K8S" == false && "$SKIP_TF" == false ]]; then
+        print_info "Destroying Kubernetes provider infrastructure..."
+        cd "$PROJECT_DIR/terraform/k8s" && terraform destroy -auto-approve || true
+    fi
+
+    if [[ "$SKIP_VAULT" == false && "$SKIP_TF" == false ]]; then
+        print_info "Destroying Vault infrastructure..."
+        cd "$PROJECT_DIR/terraform/vault" && terraform destroy -auto-approve || true
+    fi
 
     print_success "Cleanup complete"
 }
