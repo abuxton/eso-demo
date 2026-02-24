@@ -27,6 +27,7 @@ A **production-ready, fully automated demo** of the [External Secrets Operator](
 		- [Main Script: `./scripts/run-demo.sh`](#main-script-scriptsrun-demosh)
 		- [Utility Script: `./scripts/eso-utils.sh`](#utility-script-scriptseso-utilssh)
 		- [Setup Validation: `./scripts/validate-setup.sh`](#setup-validation-scriptsvalidate-setupsh)
+		- [Additional Provider Manager: `./scripts/manage-providers.sh`](#additional-provider-manager-scriptsmanage-providerssh)
 	- [🔄 Demo Workflow](#-demo-workflow)
 	- [📊 Understanding the Demos](#-understanding-the-demos)
 		- [Demo 1: Pull Secrets from External Providers ✅](#demo-1-pull-secrets-from-external-providers-)
@@ -50,6 +51,8 @@ A **production-ready, fully automated demo** of the [External Secrets Operator](
 
 This repository provides an **end-to-end automated demo** that showcases:
 
+![run-demo](docs/_assets/demo-k8s-only.gif)
+
 ### 🎯 4 Complete Demo Scenarios
 
 1. **Demo 1: Pull Secrets from External Providers**
@@ -71,10 +74,16 @@ This repository provides an **end-to-end automated demo** that showcases:
 
 ### 🚀 Supported Providers
 
+**Core Providers** (seamlessly integrated):
 - **AWS**: Secrets Manager (SecretsManager) & Parameter Store (ParameterStore)
 - **Azure**: Key Vault
 - **HashiCorp Vault**: Local or remote instances
 - **Kubernetes**: Multi-cluster secret synchronization
+
+**Additional Providers** (use `--additional-provider` flag):
+- **Conjur**: CyberArk Conjur Open Source (via Docker Compose)
+
+See [PROVIDER_INTEGRATION.md](docs/PROVIDER_INTEGRATION.md) for how to add new providers.
 
 ### 🛠️ Complete Automation
 
@@ -128,7 +137,12 @@ source .env  # Load AWS/Azure credentials
 ./scripts/run-demo.sh
 ```
 
-**Option C: common run locally only**
+**Option C: With additional provider (Conjur)**
+```bash
+./scripts/run-demo.sh --provider vault --additional-provider conjur --skip-aws --skip-azure
+```
+
+**Option D: Local-only demo**
 ```bash
 ./scripts/run-demo.sh --provider k8s --skip-tf --skip-azure --skip-aws
 ```
@@ -157,6 +171,7 @@ We've created comprehensive documentation to help you get the most out of this d
 | Document | Purpose |
 |----------|---------|
 | **[PROJECT_SUMMARY.md](docs/PROJECT_SUMMARY.md)** | Full project inventory & architecture |
+| **[PROVIDER_INTEGRATION.md](docs/PROVIDER_INTEGRATION.md)** | How to add new optional providers (standardized guide) |
 | **[DEBUG_GUIDE_UPDATED.md](docs/debugging/DEBUG_GUIDE_UPDATED.md)** | Troubleshooting guide & error solutions |
 | **[API_VERSION_FIX.md](docs/fixes/API_VERSION_FIX.md)** | API compatibility details |
 | **[FIXES_APPLIED.md](docs/fixes/FIXES_APPLIED.md)** | Session fixes & improvements |
@@ -278,6 +293,30 @@ Verify all prerequisites are installed and configured.
 # ✓ Cluster permissions
 # ⚠ Warnings for disk/memory constraints
 ```
+
+### Additional Provider Manager: `./scripts/manage-providers.sh`
+
+Manage optional secret providers (like Conjur) that extend the core demo.
+
+**Commands:**
+```bash
+./scripts/manage-providers.sh list                    # List available providers
+./scripts/manage-providers.sh setup conjur            # Start Conjur
+./scripts/manage-providers.sh status conjur           # Check Conjur status
+./scripts/manage-providers.sh cleanup conjur          # Stop Conjur
+./scripts/manage-providers.sh setup conjur --dry-run  # Preview commands
+```
+
+**Integration with run-demo.sh:**
+```bash
+# Include Conjur in the main demo
+./scripts/run-demo.sh --provider vault --additional-provider conjur
+
+# Skip a provider
+./scripts/run-demo.sh --skip-conjur
+```
+
+See [PROVIDER_INTEGRATION.md](docs/PROVIDER_INTEGRATION.md) for how to add new providers.
 
 ## 🔄 Demo Workflow
 

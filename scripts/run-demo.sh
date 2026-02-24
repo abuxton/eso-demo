@@ -13,22 +13,24 @@
 #   ./scripts/run-demo.sh [OPTIONS]
 #
 # Options:
-#   --help                Show this help message
-#   --dry-run             Print all commands without executing them
-#   --provider PROVIDER   Specify provider (awssm|awsps|azure|vault|k8s) - default: azure
-#   --cleanup-only        Run only cleanup (skip demo creation)
-#   --skip-tf             Skip Terraform infrastructure creation
-#   --skip-vault          Skip Vault/HashiCorp Vault setup
-#   --skip-aws            Skip AWS setup
-#   --skip-azure          Skip Azure setup
-#   --skip-k8s            Skip Kubernetes provider setup
-#   --no-cleanup          Don't run cleanup at the end
+#   --help                     Show this help message
+#   --dry-run                  Print all commands without executing them
+#   --provider PROVIDER        Specify provider (awssm|awsps|azure|vault|k8s) - default: azure
+#   --cleanup-only             Run only cleanup (skip demo creation)
+#   --additional-provider PRV  Manage optional provider (conjur) alongside core providers
+#   --skip-tf                  Skip Terraform infrastructure creation
+#   --skip-vault               Skip Vault/HashiCorp Vault setup
+#   --skip-aws                 Skip AWS setup
+#   --skip-azure               Skip Azure setup
+#   --skip-k8s                 Skip Kubernetes provider setup
+#   --no-cleanup               Don't run cleanup at the end
 #
 # Examples:
-#   ./scripts/run-demo.sh                          # Run full demo with Azure (default)
-#   ./scripts/run-demo.sh --dry-run                # Preview all commands
-#   ./scripts/run-demo.sh --provider vault         # Run with Vault provider
-#   ./scripts/run-demo.sh --dry-run --provider aws # Preview AWS commands
+#   ./scripts/run-demo.sh                                    # Run full demo with Azure (default)
+#   ./scripts/run-demo.sh --dry-run                         # Preview all commands
+#   ./scripts/run-demo.sh --provider vault                  # Run with Vault provider
+#   ./scripts/run-demo.sh --additional-provider conjur      # Include Conjur as optional provider
+#   ./scripts/run-demo.sh --dry-run --provider aws          # Preview AWS commands
 #
 # Prerequisites:
 #   - kubectl configured and connected to a cluster (rancher-desktop, minikube, etc.)
@@ -61,10 +63,12 @@ SKIP_AWS=false
 SKIP_AZURE=false
 SKIP_K8S=false
 CLEANUP_ONLY=false
+ADDITIONAL_PROVIDERS=()
 
 # Script configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"  # Parent directory (project root)
+PROVIDERS_DIR="$PROJECT_DIR/providers"
 DEMO_NAMESPACE="eso-demo"
 CRED_NAMESPACE="cred"
 REMOTE_K8S_NAMESPACE="remote-cluster"
@@ -87,17 +91,18 @@ USAGE:
   ./scripts/run-demo.sh [OPTIONS]
 
 OPTIONS:
-  --help              Show this help message
-  --dry-run           Print all commands without executing them
-  --provider PROVIDER Specify provider (awssm|awsps|azure|vault|k8s)
-                      Default: azure
-  --cleanup-only      Run cleanup only (skip demo recreation)
-  --skip-tf           Skip Terraform infrastructure creation
-  --skip-vault        Skip Vault/HashiCorp Vault setup
-  --skip-aws          Skip AWS setup
-  --skip-azure        Skip Azure setup
-  --skip-k8s          Skip Kubernetes provider setup
-  --no-cleanup        Don't run cleanup at the end
+  --help                     Show this help message
+  --dry-run                  Print all commands without executing them
+  --provider PROVIDER        Specify provider (awssm|awsps|azure|vault|k8s)
+                             Default: azure
+  --cleanup-only             Run cleanup only (skip demo recreation)
+  --additional-provider PRV  Include optional provider (conjur) in demo
+  --skip-tf                  Skip Terraform infrastructure creation
+  --skip-vault               Skip Vault/HashiCorp Vault setup
+  --skip-aws                 Skip AWS setup
+  --skip-azure               Skip Azure setup
+  --skip-k8s                 Skip Kubernetes provider setup
+  --no-cleanup               Don't run cleanup at the end
 
 EXAMPLES:
 
@@ -109,6 +114,9 @@ EXAMPLES:
 
   # Run demo with Vault backend
   ./scripts/run-demo.sh --provider vault
+
+  # Run with additional Conjur provider
+  ./scripts/run-demo.sh --provider vault --additional-provider conjur --skip-aws --skip-azure
 
   # Preview AWS commands with dry-run
   ./scripts/run-demo.sh --dry-run --provider awssm
@@ -320,6 +328,10 @@ parse_args() {
                 SKIP_K8S=true
                 shift
                 ;;
+            --additional-provider)
+                ADDITIONAL_PROVIDERS+=("$2")
+                shift 2
+                ;;
             --no-cleanup)
                 CLEANUP_ENABLED=false
                 shift
@@ -342,6 +354,21 @@ parse_args() {
             exit 1
             ;;
     esac
+
+    # Validate provider and --skip-tf compatibility
+    if [[ "$SKIP_TF" == true ]]; then
+        case "$PROVIDER" in
+            awssm|awsps|azure|k8s)
+                print_error "Provider '$PROVIDER' requires Terraform infrastructure"
+                print_info "Cannot use --skip-tf with --provider $PROVIDER"
+                print_info "Remove --skip-tf or use --provider vault"
+                exit 1
+                ;;
+            vault)
+                # Vault provider works without Terraform (installed via Helm)
+                ;;
+        esac
+    fi
 }
 
 # Create required namespaces
@@ -609,13 +636,20 @@ setup_kubernetes_provider() {
         return 1
     fi
 
-    run_command \
-        "cd $tf_dir && terraform init" \
-        "Initialize Terraform for Kubernetes provider"
+    # Check if remote-cluster namespace already exists
+    if kubectl get namespace $REMOTE_K8S_NAMESPACE &>/dev/null; then
+        print_info "Kubernetes remote-cluster namespace already exists (from previous run)"
+        print_info "Skipping Terraform infrastructure setup"
+        print_info "Existing infrastructure will be reused"
+    else
+        run_command \
+            "cd $tf_dir && terraform init" \
+            "Initialize Terraform for Kubernetes provider"
 
-    run_command \
-        "cd $tf_dir && terraform apply -auto-approve" \
-        "Apply Kubernetes Terraform configuration"
+        run_command \
+            "cd $tf_dir && terraform apply -auto-approve" \
+            "Apply Kubernetes Terraform configuration"
+    fi
 
     if [[ "$DRY_RUN" == false ]]; then
         # Get cluster API server URL and extract components
@@ -868,7 +902,7 @@ run_demo_4_generators() {
 
         print_info "Display fake data:"
         run_command \
-            "kubectl get secret fake -n $DEMO_NAMESPACE -o jsonpath='{.data}' | jq '.' | base64 -d" \
+            "kubectl get secret fake -n $DEMO_NAMESPACE -o jsonpath='{.data}' | jq 'with_entries(.value |= @base64d)'" \
             "Display fake generator data"
     fi
 
@@ -929,7 +963,26 @@ cleanup_demo() {
     kubectl delete clustersecretstore --all || true
 
     print_info "Deleting namespaces..."
-    kubectl delete ns $DEMO_NAMESPACE $CRED_NAMESPACE $REMOTE_K8S_NAMESPACE || true
+    kubectl delete ns $DEMO_NAMESPACE $CRED_NAMESPACE 2>/dev/null || true
+
+    # Delete remote K8s namespace if it exists
+    if kubectl get namespace $REMOTE_K8S_NAMESPACE &>/dev/null; then
+        kubectl delete ns $REMOTE_K8S_NAMESPACE 2>/dev/null || true
+    fi
+
+    # Wait for namespaces to be fully removed
+    print_info "Waiting for namespaces to be fully deleted..."
+    local max_wait=60
+    local waited=0
+    while kubectl get ns $DEMO_NAMESPACE &>/dev/null || kubectl get ns $CRED_NAMESPACE &>/dev/null || kubectl get ns $REMOTE_K8S_NAMESPACE &>/dev/null; do
+        if [[ $waited -ge $max_wait ]]; then
+            print_warning "Timeout waiting for namespaces to delete. Some may still be terminating."
+            break
+        fi
+        sleep 2
+        ((waited+=2))
+    done
+    print_success "Namespaces deleted"
 
     # Destroy Terraform infrastructure
     if [[ "$SKIP_AWS" == false && "$SKIP_TF" == false ]]; then
@@ -951,6 +1004,12 @@ cleanup_demo() {
         print_info "Destroying Vault infrastructure..."
         cd "$PROJECT_DIR/terraform/vault" && terraform destroy -auto-approve || true
     fi
+
+    # Cleanup additional providers
+    for additional_provider in "${ADDITIONAL_PROVIDERS[@]}"; do
+        print_info "Cleaning up $additional_provider provider..."
+        bash "$PROVIDERS_DIR/manage-providers.sh" cleanup "$additional_provider" || true
+    done
 
     print_success "Cleanup complete"
 }
@@ -999,6 +1058,20 @@ BANNER
     setup_aws
     setup_azure
     setup_kubernetes_provider
+
+    # Setup additional providers if specified
+    for additional_provider in "${ADDITIONAL_PROVIDERS[@]}"; do
+        print_step "Setting Up $additional_provider Additional Provider"
+        if [[ "$DRY_RUN" == false ]]; then
+            bash "$PROVIDERS_DIR/manage-providers.sh" setup "$additional_provider" || {
+                print_warning "$additional_provider setup failed, continuing demo without $additional_provider"
+            }
+        else
+            print_info "$ bash $PROVIDERS_DIR/manage-providers.sh setup $additional_provider"
+        fi
+        print_success "$additional_provider provider setup complete"
+    done
+
     create_clustersecretstores
 
     # Demo phase
